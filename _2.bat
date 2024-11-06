@@ -1,0 +1,1 @@
+Get-Date | Out-File -FilePath openssl_key_cer_md5.log

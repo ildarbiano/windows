@@ -8,10 +8,14 @@ set "path_enc=!path_cert!\enc"
 set "path_restore=!path_cert!\restore"
 set "path_log_md5=!path_cert!\openssl_key_cer_md5.log"
 set "openssl=C:\ProgramData\OpenSSL-1.1.1h_win32\openssl.exe"
- 
+set "date=начало"
 
-echo "$Get-Date" >> !path_log_md5!
+
+
+echo "!date!" >> !path_log_md5!
+
 echo "see log work !path_log_md5!"
+
 
 
 mkdir !path_enc! 2> NUL
@@ -21,8 +25,8 @@ mkdir !path_restore! 2> NUL
 for %%f in (!path_cert!\*.cer) do (
   set "file_name=%%~nf"
 
-  echo !file_name!
-  echo !file_name! >> !path_log_md5!
+  echo "filename is - "!file_name!""
+  echo "имя файла сертификата\ключа = !file_name!" >> !path_log_md5!
 
   set "file_key=!path_cert!\!file_name!.key"
   set "file_key_enc=!path_enc!\!file_name!.key_enc"
