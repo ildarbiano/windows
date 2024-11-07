@@ -8,18 +8,22 @@ set "path_enc=!path_cert!\enc"
 set "path_restore=!path_cert!\restore"
 set "path_log_md5=!path_cert!\openssl_key_cer_md5.log"
 set "openssl=C:\ProgramData\OpenSSL-1.1.1h_win32\openssl.exe"
-set "date=начало"
+rem set "date=начало"
+set datetimef=%date:~-4%-%date:~3,2%-%date:~0,2%  %time:~0,2%:%time:~3,2%:%time:~6,2%
+rem date >> !path_log_md5!
 
-
-
-echo "!date!" >> !path_log_md5!
-
+echo %datetimef% >> !path_log_md5!
 echo "see log work !path_log_md5!"
 
 
 
 mkdir !path_enc! 2> NUL
 mkdir !path_restore! 2> NUL
+
+
+
+rem(a b c) это список (не обязательно из 3-х элементов)
+:: переменная %%i (нужно ставить символ после процентов, а не между) по очереди проходит по значениям в списке
 
 
 for %%f in (!path_cert!\*.cer) do (
