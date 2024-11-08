@@ -25,25 +25,26 @@ mkdir !path_restore! 2> NUL
 rem(a b c) это список (не обязательно из 3-х элементов)
 :: переменная %%i (нужно ставить символ после процентов, а не между) по очереди проходит по значениям в списке
 
-
+:: Для обозначения параметра переменная можно использовать любые знаки, кроме цифр 0–9, чтобы не было конфликта с параметрами пакетных файлов %0–%9. 
+:: Для простых пакетных файлов вполне достаточно обозначений с одним знаком, например %%f.
 for %%f in (!path_cert!\*.cer) do (
+:: очистка имени файла переменной %%f , подлежащих шифрованию. 
+:: где ~n сообщает cmd, что нужно расширить f так, чтобы она равнялась только имени файла, за вычетом расширения
   set "file_name=%%~nf"
+  echo "name of file which we' encode is - "!file_name!""
+:: вывод имени файлов ключа и сертификата в лог файл
+  echo "имя файла сертификата\ключа, которые будем шифровать = !file_name!" >> !path_log_md5!
 
-  echo "filename is - "!file_name!""
-  echo "имя файла сертификата\ключа = !file_name!" >> !path_log_md5!
-
+:: шифрование ключа
   set "file_key=!path_cert!\!file_name!.key"
   set "file_key_enc=!path_enc!\!file_name!.key_enc"
   set "file_key_restore=!path_restore!\!file_name!.key_restore"
-
- 
   !openssl! rsa -noout  -modulus -in !file_key! | !openssl! md5 >> !path_log_md5!
 
+:: шифрование сертификата
   set "file_cer=!path_cert!\!file_name!.cer"
   set "file_cer_enc=!path_enc!\!file_name!.cer_enc"
   set "file_cer_restore=!path_restore!\!file_name!.cer_restore"
-
-
   !openssl! x509 -noout -modulus -in !file_cer! | !openssl! md5 >> !path_log_md5!
 
   echo 'конец' >> !path_log_md5!
