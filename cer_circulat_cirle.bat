@@ -16,21 +16,21 @@ echo !datetime! >> !log!
 
 
 for /F %%f in (!list!) do (
-:: извлекаем из списка fqdn и выаодим его в лог файл
   set "file_name=%%f"
-  echo %%f >> !log!   
+  echo %%f >> !log!
   
-:: формируем имя клона
   set "cer_name=!path_out!\!file_name!.cer_enc"
   set "key_name=!path_out!\!file_name!.key_enc"
-  
-:: копируем cer в cer, key в key
   copy /v "!path_input_cer!" "!cer_name!"
   copy /v "!path_input_key!" "!key_name!"
   
-
+  
+  echo 'конец списка' >> !log!
+  echo '------------' >> !log!
+  
   
   )
-  
-echo '-- конец списка тиража =====' >> !log!
+echo '------------' >> !log!
 exit  
+  
+:: if ююю (echo !file_name! >> !log!)  else (echo "-" >> !log!) 
