@@ -6,15 +6,15 @@ set "path_cert=C:\Users\123\windows"
 set "pass=jDn5opLp1lz"
 set "path_enc=!path_cert!\enc"
 set "path_restore=!path_cert!\restore"
-set "path_log_md5=!path_cert!\openssl_key_cer_md5.log"
+set "path_log_md5=!path_cert!\%~n0.log"
 set "openssl=C:\ProgramData\OpenSSL-1.1.1h_win32\openssl.exe"
-rem set "date=начало"
-set datetimef=%date:~-4%-%date:~3,2%-%date:~0,2%  %time:~0,2%:%time:~3,2%:%time:~6,2%
-rem date >> !path_log_md5!
 
-echo %datetimef% >> !path_log_md5!
 echo "see log work !path_log_md5!"
+echo "----" >> !path_log_md5!
 
+:: формирование формата времени для записи в лог истории скрипта
+set datetime=%date:~-4%-%date:~3,2%-%date:~0,2%  %time:~0,2%:%time:~3,2%:%time:~6,2%
+echo " Начало отчёта от !datetime!" >> !path_log_md5!
 
 
 mkdir !path_enc! 2> NUL
@@ -40,21 +40,34 @@ for %%f in (!path_cert!\*.cer) do (
   set "file_key_enc=!path_enc!\!file_name!.key_enc"
   set "file_key_restore=!path_restore!\!file_name!.key_restore"
   !openssl! rsa -noout  -modulus -in !file_key! | !openssl! md5 >> !path_log_md5!
-
+  echo "md5 для оригинального .key" >> !path_log_md5!
+  
 :: шифрование сертификата
   set "file_cer=!path_cert!\!file_name!.cer"
   set "file_cer_enc=!path_enc!\!file_name!.cer_enc"
   set "file_cer_restore=!path_restore!\!file_name!.cer_restore"
   !openssl! x509 -noout -modulus -in !file_cer! | !openssl! md5 >> !path_log_md5!
+  echo "md5 для оригинального .cer" >> !path_log_md5!
 
-  echo 'конец' >> !path_log_md5!
 
+  echo '' >> !path_log_md5!
 
+:: 
   !openssl! enc -aes-256-cbc -base64 -salt -md sha256 -in !file_key! -out !file_key_enc! -pass pass:!pass!
   !openssl! enc -aes-256-cbc -base64 -salt -md sha256 -in !file_cer! -out !file_cer_enc! -pass pass:!pass!
+  
+  echo 'ПРОВЕРКА md5 после ШИФРАЦИИ и ДЕШИФРАЦИИ' >> !path_log_md5!
+:: Проверка шифрования и дешифрования ключа  
   !openssl! enc -aes-256-cbc -base64 -salt -md sha256 -d -in !file_key_enc! -out !file_key_restore!  -k !pass!
+  echo "md5 для .key после шифрации и дешифрации" >> !path_log_md5!
+    !openssl! rsa -noout  -modulus -in !file_key_restore! | !openssl! md5 >> !path_log_md5!
+	
+:: Проверка шифрования и дешифрования сертификата	
   !openssl! enc -aes-256-cbc -base64 -salt -md sha256 -d -in !file_cer_enc! -out !file_cer_restore!  -k !pass!
+  echo "md5 для .cer после шифрации и дешифрации" >> !path_log_md5!
+  !openssl! rsa -noout  -modulus -in !file_cer_restore! | !openssl! md5 >> !path_log_md5!
+ 
 
-  echo '-----------------------' >> !path_log_md5!
+  echo 'Конец отчёта' >> !path_log_md5!
 
   )
